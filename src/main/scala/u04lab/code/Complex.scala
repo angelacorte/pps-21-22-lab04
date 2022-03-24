@@ -7,7 +7,7 @@ trait Complex:
   def *(c: Complex): Complex // should implement the product of two complex numbers
 
 object Complex:
-  def apply(re: Double, im: Double): Complex = ??? // Fill here
+  def apply(re: Double, im: Double): Complex = ComplexImpl(re, im) // Fill here
 
 @main def checkComplex(): Unit =
   val a = Array(Complex(10, 20), Complex(1, 1), Complex(7, 0))
@@ -22,3 +22,13 @@ object Complex:
   *   - use a case class ComplexImpl instead, creating objects without the 'new' keyword
   *   - check equality and toString now
   */
+
+case class ComplexImpl(_re: Double, _im: Double) extends Complex:
+
+  override def re: Double = _re
+
+  override def im: Double = _im
+
+  override def +(c: Complex): Complex = Complex(_re + c.re, _im + c.im)
+
+  override def *(c: Complex): Complex = Complex(_re * c.re - _im * c.im, _re * c.im + c.re * _im)

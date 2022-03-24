@@ -60,4 +60,11 @@ object List:
     case _ => Nil()
 
   def take[A](list: List[A], n: Int): List[A] = reverse(drop(reverse(list), length(list) - n))
+
+  def listFactory[A](elem: A*): List[A] =
+    var list: List[A] = Nil()
+    elem.foreach(e => if list != Nil() then list = Cons(e, list)
+      else list = Cons(e, Nil()))
+    list
+
 end List
