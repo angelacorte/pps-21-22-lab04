@@ -1,6 +1,7 @@
 package u04lab.code
 
 import List.*
+import scala.Option.*
 
 trait Student:
   def name: String
@@ -26,28 +27,25 @@ case class CourseImpl(_name: String, _teacher: String) extends Course:
 case class StudentImpl(_name: String, _year: Int) extends Student:
 
   private var coursesList: List[Course] = Nil()
-
   override def name: String = _name
-
   override def year: Int = _year
-
   override def enrolling(course: Course*): Unit =
     course.foreach(c => if coursesList != Nil() then coursesList = Cons(c, coursesList)
      else coursesList = Cons(c, Nil()) )
 
-  override def courses: List[String] =
-    map(coursesList)(_.name)
+  override def courses: List[String] = map(coursesList)(_.name)
+  override def hasTeacher(teacher: String): Boolean = contains(map(coursesList)(_.teacher), teacher)
 
-  override def hasTeacher(teacher: String): Boolean =
-    contains(map(coursesList)(_.teacher), teacher)
-
-  def sameTeacher(course: List[Course]): String =
-    ???
+object SameTeacher:
+  def unapply(courses: List[Course]): scala.Option[String] = courses match
+    case Cons(c, t) if length(filter(map(courses)(_.teacher))(s => s == c.teacher)) == length(courses) => scala.Option(c.teacher)
+    case _ => empty
 
 @main def checkStudents(): Unit =
   val cPPS = Course("PPS", "Viroli")
   val cPCD = Course("PCD", "Ricci")
   val cSDR = Course("SDR", "D'Angelo")
+  val cOOP = Course("OOP", "Viroli")
   val s1 = Student("mario", 2015)
   val s2 = Student("gino", 2016)
   val s3 = Student("rino") // defaults to 2017
@@ -59,12 +57,10 @@ case class StudentImpl(_name: String, _year: Int) extends Student:
   ) // (Cons(PCD,Cons(PPS,Nil())),Cons(PPS,Nil()),Cons(SDR,Cons(PCD,Cons(PPS,Nil()))))
   println(s1.hasTeacher("Ricci")) // true
 
+  def sameTeacher(courses: List[Course]): String = courses match
+    case SameTeacher(t) => s"$courses have same teacher $t"
+    case _ => s"$courses have different teachers"
 
-/** Hints:
-  *   - simply implement Course, e.g. with a case class
-  *   - implement Student with a StudentImpl keeping a private Set of courses
-  *   - try to implement in StudentImpl method courses with map
-  *   - try to implement in StudentImpl method hasTeacher with map and find
-  *   - check that the two println above work correctly
-  *   - refactor the code so that method enrolling accepts a variable argument Course*
-  */
+  println(sameTeacher(Cons(cPPS, Cons(cOOP, Nil()))))
+  println(sameTeacher(Cons(cPPS, Cons(cPCD, Nil()))))
+
